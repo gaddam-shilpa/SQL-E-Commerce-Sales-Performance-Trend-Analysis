@@ -1,10 +1,10 @@
-**📊 E-Commerce Sales Performance \& Trend Analys**is
+# 📊 E-Commerce Sales Performance \& Trend Analys
 
-**📌 Project Overview**
+## 📌 Project Overview
 This project analyzes sales, customers, and product data using Basic to Advanced SQL.
 The data was cleaned and loaded into a relational database and then analyzed to understand business performance, trends over time, and product/customer behavior.
 
-**🧪 SQL Concepts Used**
+## 🧪 SQL Concepts Used
 Joins
 Aggregate functions
 CTEs
@@ -15,7 +15,7 @@ Moving averages
 CASE statements
 Views
 
-**📁Key Analysis \& Insights**
+## 📁Key Analysis \& Insights
 * Designed and executed end-to-end SQL analysis on e-commerce sales data (~29M revenue, 23K+ customers, 270+ products) to evaluate business performance and trends.
 * Built core business KPIs using advanced SQL aggregations (SUM, COUNT, AVG) to quantify total sales, orders, customers, and pricing behavior.
 * Applied CTEs and window functions to perform cumulative analysis, identifying that over 50% of total revenue was generated in the final year, indicating accelerating growth.
@@ -23,7 +23,7 @@ Views
 * Performed product performance analysis using year-over-year comparisons and ranking functions, identifying 33% improving products and 15% declining products across the catalog.
 * Created reusable customer-level and product-level SQL views to centralize KPIs such as revenue, recency, lifespan, and average order value for downstream analysis and reporting.
 
-**🧠 Analytical Summary**
+## 🧠 Analytical Summary
 This project follows a step-by-step analytical flow to understand how the business performs and evolves.
 The analysis begins with exploring customer and product dimensions 🌍📦 to understand geographic coverage and product structure. This step helps validate the data and ensures it is suitable for deeper analysis.
 Next, core business metrics 📈 such as total sales, orders, customers, and average prices are calculated to create a baseline view of overall performance. This provides a quick snapshot of the size and health of the business.
@@ -35,13 +35,13 @@ Product performance is further evaluated year over year to identify improving, s
 Finally, reusable SQL views 🧩 are created to summarize customer-level and product-level metrics, making future analysis and reporting easier without rewriting complex queries.
 Overall, this project demonstrates the use of SQL for end-to-end data analysis, from data exploration and KPI creation to trend analysis, cumulative growth tracking, and performance evaluation.
 
-**🛠️ Tech Stack**
+## 🛠️ Tech Stack
 SQL (MySQL)
 Relational Database
 CSV Data
 ETL for data cleaning and loading
 
-**✅ Project Outcome**
+## ✅ Project Outcome
 This project showcases:
 Structured SQL-based data analysis 🔍
 Business-focused KPI creation 📊
