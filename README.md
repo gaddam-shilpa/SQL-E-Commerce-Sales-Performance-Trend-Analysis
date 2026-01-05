@@ -8,14 +8,12 @@ The data was cleaned and loaded into a relational database and then analyzed to 
 Joins, Aggregate functions, CTEs, Window functions, Ranking functions, Running totals, Moving averages, CASE statements, Views
 
 ## 📁Key Analysis \& Insights
-<p align="justify">
 * Designed and executed end-to-end SQL analysis on e-commerce sales data (~29M revenue, 23K+ customers, 270+ products) to evaluate business performance and trends.
 * Built core business KPIs using advanced SQL aggregations (SUM, COUNT, AVG) to quantify total sales, orders, customers, and pricing behavior.
 * Applied CTEs and window functions to perform cumulative analysis, identifying that over 50% of total revenue was generated in the final year, indicating accelerating growth.
 * Used running totals and 3-month moving averages to detect volume-driven growth, where average prices declined sharply while sales increased.
 * Performed product performance analysis using year-over-year comparisons and ranking functions, identifying 33% improving products and 15% declining products across the catalog.
 * Created reusable customer-level and product-level SQL views to centralize KPIs such as revenue, recency, lifespan, and average order value for downstream analysis and reporting.
-</p>
 
 ## 🧠 Analytical Summary
 <p align="justify">
