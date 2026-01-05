@@ -24,7 +24,7 @@ Views
 * Created reusable customer-level and product-level SQL views to centralize KPIs such as revenue, recency, lifespan, and average order value for downstream analysis and reporting.
 
 **🧠 Analytical Summary**
-This project follows a step-by-step analytical flow to understand how the business performs and evolves over time.
+This project follows a step-by-step analytical flow to understand how the business performs and evolves.
 The analysis begins with exploring customer and product dimensions 🌍📦 to understand geographic coverage and product structure. This step helps validate the data and ensures it is suitable for deeper analysis.
 Next, core business metrics 📈 such as total sales, orders, customers, and average prices are calculated to create a baseline view of overall performance. This provides a quick snapshot of the size and health of the business.
 To understand where the business is strong, distribution analysis is performed across countries and product categories. This helps identify major markets, revenue-contributing categories, and high-value customers.
