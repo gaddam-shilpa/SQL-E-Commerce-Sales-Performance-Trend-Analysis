@@ -1,8 +1,7 @@
 # 📊 E-Commerce Sales Performance \& Trend Analys
 
 ## 📌 Project Overview
-This project analyzes sales, customers, and product data using Basic to Advanced SQL.
-
+This project analyzes sales, customers, and product data using Basic to Advanced SQL.<br>
 The data was cleaned and loaded into a relational database and then analyzed to understand business performance, trends over time, and product/customer behavior.
 
 ## 🧪 SQL Concepts Used
