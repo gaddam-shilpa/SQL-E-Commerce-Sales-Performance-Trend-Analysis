@@ -1,0 +1,16 @@
+# Environment secrets
+.env
+config/.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Ignore local analysis and notes
+Analysis_Metrics.xlsx
+In_detail_explanation.docx
+analysis_queries.txt

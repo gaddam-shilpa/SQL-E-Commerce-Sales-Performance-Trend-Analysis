@@ -1,0 +1,616 @@
+/*
+================= Dimension Exploration =========================================
+Using Distinct and Order by function to explore the data of dimention tables
+
+SQL Function used:
+	DISTINCT()
+*/
+
+-- Retrieve a list of unique countries from which customers originate
+SELECT DISTINCT country
+FROM dataWarehouseAnalytics.dim_customers
+order by country;
+
+-- Retrieve a list of unique categories, subcategories, and products
+SELECT DISTINCT category, subcategory, product_name
+FROM DataWarehouseAnalytics.dim_products;
+
+
+/*
+========================================== Data Range Exploration ====================================
+SQL FUNCTION USED:
+	MIN(), MAX(), TIMESTAMPDIFF()
+*/
+
+-- Determine the first and last order date and the total duration in months
+SELECT 
+	MIN(order_date) AS first_order_date,
+	MAX(order_date) AS last_order_date,
+	timestampdiff(MONTH, MIN(order_date), MAX(order_date)) AS total_duration
+FROM DataWarehouseAnalytics.fact_sales;
+
+-- Find the youngest and oldest customer based on birthdate
+SELECT
+	MIN(birthdate) AS oldest_customer,
+    timestampdiff(YEAR, MIN(birthdate), CURDATE()) AS old_age,
+    MAX(birthdate) AS youngest_customer,
+    timestampdiff(YEAR, MAX(birthdate), CURDATE()) AS young_age
+FROM DataWarehouseAnalytics.dim_customers;
+
+
+/*
+====================== Measures Exploration (Key Metrics)===============================
+To calculate aggregated metrics for quick insights. Also to identify overall trends and any anamolies.
+
+SQL FUNCTION USED:
+	COUNT(), SUM(), AVG(), ROUND()
+*/
+
+-- Find the Total Sales
+SELECT SUM(sales_amount) AS total_sales FROM DataWarehouseAnalytics.fact_sales;
+
+-- Find how many items are sold
+SELECT SUM(quantity) AS total_items_sold FROM DataWarehouseAnalytics.fact_sales;
+
+-- Find the average selling price
+SELECT ROUND(AVG(price)) AS avg_selling_price FROM DataWarehouseAnalytics.fact_sales;
+
+-- Find the Total number of Orders
+SELECT COUNT(DISTINCT order_number) AS total_orders FROM DataWarehouseAnalytics.fact_sales;
+
+-- Find the total number of products
+SELECT  COUNT(DISTINCT product_id) AS total_products FROM DataWarehouseAnalytics.dim_products;
+
+-- Find the total number of customers
+SELECT COUNT(DISTINCT customer_id) AS total_customers FROM DataWarehouseAnalytics.dim_customers; 
+SELECT COUNT(customer_key) AS total_customers FROM DataWarehouseAnalytics.dim_customers;
+
+-- Find the total number of customers that has placed an order
+SELECT COUNT(DISTINCT customer_key) AS total_customers FROM DataWarehouseAnalytics.fact_sales;
+
+-- Generate a Report that shows all key metrics of the business
+SELECT 'Total_Sales' AS measures_name, SUM(sales_amount) AS measure_value FROM DataWarehouseAnalytics.fact_sales
+UNION ALL
+SELECT 'total_items_sold', SUM(quantity) FROM DataWarehouseAnalytics.fact_sales
+UNION ALL
+SELECT 'avg_selling_price', ROUND(AVG(sales_amount)) FROM DataWarehouseAnalytics.fact_sales
+UNION ALL
+SELECT 'total_orders', COUNT(DISTINCT order_number) FROM DataWarehouseAnalytics.fact_sales
+UNION ALL
+SELECT 'total_products', COUNT(DISTINCT product_id) FROM DataWarehouseAnalytics.dim_products
+UNION ALL
+SELECT 'total_customers', COUNT(DISTINCT customer_key) FROM DataWarehouseAnalytics.dim_customers; 
+
+/*
+======================================== Magnitute Analysis ===========================================
+To understand the sales/product consumption/distribution across the area
+
+SQL FUNCTION USED: 
+	COUNT(), SUM(), ROUND(), AVG()
+*/
+
+-- Find total customers by countries
+SELECT country, COUNT(customer_key) AS total_customers_by_country
+FROM DataWarehouseAnalytics.dim_customers
+GROUP BY country
+ORDER BY total_customers_by_country DESC;
+
+-- Find total customers by gender
+SELECT gender, COUNT(customer_key) AS total_customer_by_gender
+FROM datawarehouseanalytics.dim_customers 
+GROUP BY gender
+ORDER BY total_customer_by_gender DESC;
+
+-- Find total products by category
+SELECT category, COUNT(product_key) AS total_products_by_category
+FROM datawarehouseanalytics.dim_products 
+GROUP BY category
+ORDER BY total_products_by_category DESC;
+
+-- What is the average costs in each category?
+SELECT category, ROUND(AVG(cost)) AS avg_cost_by_category
+FROM datawarehouseanalytics.dim_products
+GROUP BY category 
+ORDER BY avg_cost_by_category DESC;
+
+
+-- What is the total revenue generated for each category?
+-- Tip: In fincancial environment, always do join from fact to dim. 
+		-- Because this shows the sales excluding the null ones and also it the query 
+        -- is faster rather than dim to fact where each list (irrespective of it did sales or not) is considered.
+SELECT dp.category AS category, SUM(fs.sales_amount) AS total_revenue_by_category
+FROM datawarehouseanalytics.fact_sales fs
+LEFT JOIN datawarehouseanalytics.dim_products dp
+	ON dp.product_key = fs.product_key
+GROUP BY dp.category
+ORDER BY total_revenue_by_category DESC;
+
+
+-- What is the total revenue generated by each customer?
+SELECT dc.customer_key AS customer_key, dc.first_name, dc.last_name, SUM(fs.sales_amount) AS total_revenue_by_customer
+FROM datawarehouseanalytics.fact_sales fs
+LEFT JOIN datawarehouseanalytics.dim_customers dc
+	ON dc.customer_key = fs.customer_key
+GROUP BY dc.customer_key, dc.first_name, dc.last_name
+ORDER BY total_revenue_by_customer DESC;
+
+-- What is the distribution of sold items across countries?
+SELECT dc.country AS country, SUM(fs.quantity) AS total_items_sold_across_country
+FROM datawarehouseanalytics.fact_sales fs
+LEFT JOIN datawarehouseanalytics.dim_customers dc
+	ON dc.customer_key = fs.customer_key
+GROUP BY dc.country
+ORDER BY total_items_sold_across_country DESC;
+
+-- What is the revenue across countries?
+SELECT dc.country AS country, SUM(fs.sales_amount) AS total_revenue_across_country
+FROM datawarehouseanalytics.fact_sales fs
+LEFT JOIN datawarehouseanalytics.dim_customers dc
+	ON dc.customer_key = fs.customer_key
+GROUP BY dc.country
+ORDER BY total_revenue_across_country DESC;
+
+/*
+========================================= Ranking Analysis ===========================
+To rank producst or customers based on the metrics perfomance
+SQL Function used:
+	SUM(), DENSE_RANK(), OVER(), SUM(), COUNT()
+*/
+
+-- Which 5 products Generating the Highest Revenue?
+SELECT p.category, p.product_name AS product_name, SUM(f.sales_amount) AS total_sales 
+FROM datawarehouseanalytics.fact_sales f
+LEFT JOIN datawarehouseanalytics.dim_products p
+	ON p.product_key = f.product_key
+GROUP BY p.category, p.product_name 
+ORDER BY total_sales DESC
+LIMIT 5;
+
+-- Complex but Flexibly Ranking Using Window Functions
+-- Two Ways to solve this
+-- First
+-- 23% 
+WITH cte AS(
+	SELECT product_name, 
+		total_sales_by_product,
+		grand_total,
+		ROUND(((total_sales_by_product/grand_total) *100),0) AS percentage,
+		DENSE_RANK() OVER(ORDER BY total_sales_by_product DESC) AS rnk
+	FROM(
+		SELECT p.product_name AS product_name, 
+			   SUM(f.sales_amount) AS total_sales_by_product, 
+			   SUM(SUM(f.sales_amount)) OVER() AS grand_total
+		FROM datawarehouseanalytics.fact_sales f
+		LEFT JOIN datawarehouseanalytics.dim_products p
+			ON p.product_key = f.product_key
+		GROUP BY p.product_name) AS t
+	)
+SELECT product_name,
+	total_sales_by_product,
+    grand_total,
+    percentage
+FROM cte
+WHERE rnk <= 5;
+
+-- Second
+SELECT *
+FROM (
+SELECT p.product_name AS product_name, 
+SUM(f.sales_amount) AS total_sales, 
+DENSE_RANK() OVER(ORDER BY SUM(f.sales_amount) DESC) AS rnk
+FROM datawarehouseanalytics.fact_sales f
+LEFT JOIN datawarehouseanalytics.dim_products p
+	ON p.product_key = f.product_key
+GROUP BY p.product_name) AS t
+WHERE rnk <=5;
+
+-- What are the 5 worst-performing products in terms of sales?
+WITH CTE AS (
+SELECT f.product_key AS product_key, 
+	p.product_name AS product_name, 
+    p.category AS category,
+	SUM(f.sales_amount) AS total_sales, 
+    DENSE_RANK() OVER(ORDER BY SUM(f.sales_amount)) AS rnk_num
+FROM datawarehouseanalytics.fact_sales f
+LEFT JOIN datawarehouseanalytics.dim_products p
+	ON p.product_key = f.product_key
+GROUP BY f.product_key, p.product_name, p.category
+)
+SELECT category, product_name, total_sales
+FROM CTE
+WHERE rnk_num <= 5;
+
+-- Find the top 10 customers who have generated the highest revenue
+WITH CTE AS (
+SELECT f.customer_key AS customer_key, 
+	c.first_name AS first_name, 
+    c.last_name AS last_name, 
+    c.gender AS gender, 
+    c.country AS country,
+	sum(f.sales_amount) AS total_sales_by_customer, 
+    DENSE_RANK() OVER(ORDER BY SUM(f.sales_amount) DESC) AS rnk_num
+FROM datawarehouseanalytics.fact_sales f
+LEFT JOIN datawarehouseanalytics.dim_customers c
+	ON c.customer_key = f.customer_key
+GROUP BY f.customer_key, c.first_name, c.last_name, c.gender, c.country
+)
+SELECT CONCAT(first_name,' ',last_name) as name, gender, country, total_sales_by_customer
+FROM CTE
+WHERE rnk_num <= 10;
+
+SELECT customer_key, AVG(sales_amount)
+FROM datawarehouseanalytics.fact_sales
+GROUP BY customer_key
+ORDER BY AVG(sales_amount) DESC;
+
+-- The 3 customers with the fewest orders placed
+WITH CTE AS(
+SELECT f.customer_key AS customer_key, c.first_name AS first_name, c.last_name AS last_name,
+	COUNT(DISTINCT f.order_number) AS total_order_by_customer
+FROM datawarehouseanalytics.fact_sales f
+LEFT JOIN datawarehouseanalytics.dim_customers c
+	ON c.customer_key = f.customer_key
+GROUP BY f.customer_key, c.first_name, c.last_name
+ORDER BY total_order_by_customer
+)
+SELECT first_name, last_name, total_order_by_customer
+FROM CTE 
+LIMIT 3;
+
+
+/*
+====================================== Change Over Time Analysis ===============================
+To identify change in sales over the period.
+SQL FUNCTION USED:
+	YEAR(), MONTH(), DATE_FORMAT()
+*/
+-- Analyse sales performance over time
+
+-- Analysis over the year
+SELECT YEAR(order_date) AS year,
+	-- MONTH(order_date) AS month,
+	SUM(sales_amount) AS total_sales, 
+    COUNT(DISTINCT customer_key) AS total_customers,
+    SUM(quantity) AS products_sold
+FROM datawarehouseanalytics.fact_sales
+WHERE order_date IS NOT NULL
+GROUP BY YEAR(order_date) -- , MONTH(order_date)
+ORDER BY year; -- , month;
+
+-- Analysis over the month
+-- Since in mysql DATE_TUNC() function is not available, will use DATE_FROMAT() as an alternative
+
+SELECT DATE_FORMAT(order_date, '%Y, %m, 01') AS order_month,
+	SUM(sales_amount) AS total_sales,
+    COUNT(DISTINCT customer_key) AS total_customers,
+    SUM(quantity) as total_quantity
+FROM datawarehouseanalytics.fact_sales
+WHERE order_date IS NOT NULL
+GROUP BY DATE_FORMAT(order_date, '%Y, %m, 01')
+ORDER BY DATE_FORMAT(order_date, '%Y, %m, 01');
+/*
+======================================== Cumulative Analysis ===================================================
+To calculate running totals or moving averages for key metrics. USeful for growth analysis or identifying long-term trends
+
+SQL FUNCTION USED:
+	DATE_FORMAT(), SUM(), ROUND(), AVG(), OVER()
+*/
+
+-- Calculate the total sales per month, the running total of sales over time and moving average of price
+WITH CTE AS(
+SELECT DATE_FORMAT(order_date, '%Y-%m-01') AS order_month,
+	   SUM(sales_amount) AS total_sales_per_month,
+       ROUND(AVG(price)) AS avg_price_per_month
+FROM datawarehouseanalytics.fact_sales
+WHERE order_date IS NOT NULL
+GROUP BY order_month
+ORDER BY order_month)
+
+SELECT *, 
+	SUM(total_sales_per_month) OVER(ORDER BY order_month) AS running_total,
+    ROUND(AVG(avg_price_per_month) OVER(ORDER BY order_month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)) AS 3_month_moving_average_price
+FROM CTE
+ORDER BY order_month;
+
+
+/*
+==================================== Performance Analysis ===============================
+To measure the performance of products, customers, or regions over time.
+For benchmarking and identifying high-performing entities.
+To track yearly trends and growth.
+
+SQL Function used:
+	YEAR(), AVG(), OVER()
+*/
+
+-- Analyze the yearly performance of products by comparing their sales 
+-- to both the average sales performance of the product and the previous year's sales.
+
+-- Was very easy to solve this, read the question thrice u will nderstand and also focus on OVER(partition by + order by) results it makes sense.
+WITH yearly_sales AS (
+SELECT YEAR(f.order_date) AS year, 
+	f.product_key AS product_key, 
+    p.product_name AS product_name, 
+    SUM(f.sales_amount)  AS total_sales
+FROM datawarehouseanalytics.fact_sales f
+LEFT JOIN datawarehouseanalytics.dim_products p
+	ON p.product_key = f.product_key
+WHERE order_date IS NOT NULL
+GROUP BY year, f.product_key, p.product_name
+)
+SELECT *,
+	ROUND(AVG(total_sales) OVER(PARTITION BY product_name)) AS avg_sales_perrformance,
+    COALESCE(LAG(total_sales) OVER(PARTITION BY product_name ORDER BY year),0) AS prev_year_sales,
+    COALESCE(total_sales - LAG(total_sales) OVER(PARTITION BY product_name ORDER BY year),0) AS sales_diff_than_py,
+    CASE 
+		WHEN total_sales - LAG(total_sales) OVER(PARTITION BY product_name ORDER BY year) > 0 THEN 'Increase'
+        WHEN total_sales - LAG(total_sales) OVER(PARTITION BY product_name ORDER BY year) < 0 THEN 'Decrease'
+		ELSE 'No Change'
+	END AS change_from_py,
+    COALESCE(total_sales - ROUND(AVG(total_sales) OVER(PARTITION BY product_name)),0) AS avg_diff,
+    CASE
+		WHEN total_sales - ROUND(AVG(total_sales) OVER(PARTITION BY product_name),0) > 0 THEN 'Above AVG'
+        WHEN total_sales - ROUND(AVG(total_sales) OVER(PARTITION BY product_name),0) < 0 THEN 'Below AVG'
+        ELSE 'No Change'
+    END AS change_in_avg,
+    CASE
+	WHEN COALESCE(LAG(total_sales) OVER(PARTITION BY product_name ORDER BY year),0) = 0 THEN 'New'
+	WHEN (total_sales - (COALESCE(LAG(total_sales) OVER(PARTITION BY product_name ORDER BY year),0))) / (COALESCE(LAG(total_sales) OVER(PARTITION BY product_name ORDER BY year),0)) <= -0.30 THEN 'Sharp Drop'
+	WHEN (total_sales - (COALESCE(LAG(total_sales) OVER(PARTITION BY product_name ORDER BY year),0))) / (COALESCE(LAG(total_sales) OVER(PARTITION BY product_name ORDER BY year),0)) < 0 THEN 'Moderate Drop'
+  ELSE 'Stable or Growing'
+END AS performance_status
+FROM yearly_sales
+ORDER BY year;
+
+-- SELECT performance_status, COUNT(*)
+-- FROM CTE2
+-- GROUP BY performance_status;
+
+
+/*
+============================== Data Segmentation Analysis ===========================================
+To analyse the data segment wise.
+SQL Function used:
+	CASE STATEMENT, COUNT(). SUM(), timestampdiff()
+	
+*/
+
+-- Segment products into cost ranges and count how many products fall into each segment
+WITH segmented_data AS(
+SELECT product_name,
+	cost,
+	CASE
+		WHEN cost >= 0 AND cost < 500 THEN 'Below 500'
+        WHEN cost >= 500 AND cost <= 1000 THEN '500-1000'
+        WHEN cost > 1000 AND cost <= 2000 THEN '1001 - 2000'
+        ELSE 'Above 2000'
+	END AS segments
+FROM datawarehouseanalytics.dim_products)
+
+SELECT segments, COUNT(product_name) AS total_products
+FROM segmented_data
+GROUP BY segments
+ORDER BY total_products DESC;
+
+
+/*Group customers into three segments based on their spending behavior:
+	- VIP: Customers with at least 12 months of history and spending more than €5,000.
+	- Regular: Customers with at least 12 months of history but spending €5,000 or less.
+	- New: Customers with a lifespan less than 12 months.
+And find the total number of customers by each group
+*/
+WITH sales_analysis AS (
+SELECT c.customer_key,
+	   SUM(f.sales_amount) AS total_sales,
+       MAX(f.order_date),
+       MIN(f.order_date),
+       timestampdiff(month, MIN(order_date), MAX(order_date)) AS total_month
+FROM datawarehouseanalytics.dim_customers c
+LEFT JOIN datawarehouseanalytics.fact_sales f
+	ON f.customer_key = c.customer_key
+-- WHERE order_date IS NOT NULL
+GROUP BY c.customer_key),
+
+segment_wise AS (
+SELECT customer_key,
+	CASE
+		WHEN ((total_month >= 12) AND (total_sales > 5000)) THEN 'VIP'
+        WHEN ((total_month >= 12) AND (total_sales <= 5000)) THEN 'Regular'
+        ELSE 'New'
+    END AS customer_category,
+    total_sales
+FROM sales_analysis)
+
+SELECT customer_category, 
+	COUNT(customer_key) AS total_customers,
+    SUM(total_sales) AS total_revenue_by_category
+FROM segment_wise
+GROUP BY customer_category
+ORDER BY total_revenue_by_category DESC;
+
+
+/*
+============================================= Classification =======================================
+To classify the overall percentage of sales of each category
+
+SQL FUNCTION USED:
+	COALESCE(), SUM(), ROUND(), CAST(), OVER()
+*/
+
+-- Which categories contribute the most to overall sales?
+WITH category_sales AS (
+SELECT p.category AS category, 
+	   COALESCE(SUM(s.sales_amount),0) AS total_sales
+FROM datawarehouseanalytics.dim_products p
+LEFT JOIN datawarehouseanalytics.fact_sales s
+	ON p.product_key = s.product_key
+GROUP BY p.category
+)
+SELECT category,
+	   total_sales,
+       SUM(total_sales) OVER() AS running_total,
+       -- round((total_sales / SUM(total_sales) OVER()) * 100) AS percentage_of_sales
+       ROUND((CAST(total_sales AS FLOAT) / SUM(total_sales) OVER ()) * 100, 2) AS percentage_of_total
+FROM category_sales
+ORDER BY percentage_of_total DESC;
+
+/*
+==================================================== Customer Report ========================================
+1. Gathers essential fields such as names, ages, and transaction details.
+2. Segments customers into categories (VIP, Regular, New) and age groups.
+3. Aggregates customer-level metrics:
+	- total orders
+	- total sales
+	- total quantity purchased
+	- total products
+	- lifespan (in months)
+4. Calculates valuable KPIs:
+	- recency (months since last order)
+	- average order value
+	- average monthly spend
+*/
+
+
+CREATE OR REPLACE VIEW datawarehouseanalytics.customer_report AS 
+WITH customer_details AS (
+SELECT c.customer_key,
+	c.customer_id,
+	customer_number, 
+    CONCAT(first_name, ' ', last_name) AS full_name,
+    timestampdiff(year, birthdate, '2014-03-01') AS age,
+    f.order_number,
+    f.product_key,
+    f.order_date,
+    f.sales_amount,
+    f.quantity
+FROM datawarehouseanalytics.dim_customers c
+LEFT JOIN datawarehouseanalytics.fact_sales f
+	ON f.customer_key = c.customer_key
+),
+aggregted_sales AS (
+SELECT customer_key, 
+	customer_number, 
+    full_name, 
+    age,
+    COUNT(DISTINCT order_number) AS total_orders,
+    SUM(sales_amount) AS total_sales,
+    SUM(quantity) AS total_quantity,
+    COUNT(DISTINCT product_key) AS total_products,
+    timestampdiff(month, MIN(order_date), MAX(order_date)) AS lifespan,
+    MAX(order_date) AS last_order_date
+FROM customer_details
+GROUP BY customer_key, customer_number, full_name, age
+)
+SELECT customer_key,
+	customer_number,
+    full_name,
+    age,
+    CASE
+		WHEN (age < 20) THEN 'Under 20'
+	    WHEN age BETWEEN 20 AND 29 THEN '20-29'
+        WHEN age BETWEEN 30 AND 39 THEN '30-39'
+        WHEN age BETWEEN 40 AND 49 THEN '40-49'
+        ELSE '50 or above'
+    END AS age_category,
+	CASE
+		WHEN ((lifespan > 12) AND (total_sales > 5000)) THEN 'VIP'
+        WHEN ((lifespan > 12) AND (total_sales <= 5000)) THEN 'Regular'
+        ELSE 'New'
+    END AS customer_category,
+    timestampdiff(month, last_order_date, '2014-03-01') AS recency,
+    total_orders,
+    total_sales,
+    total_quantity,
+    total_products,
+    lifespan,
+    CASE -- Compuate average order value (AVO)
+		WHEN total_sales = 0 THEN '0'
+        ELSE ROUND((total_sales / total_orders))
+	END AS average_order_value,
+    CASE -- Compuate average monthly spend
+		WHEN total_sales = 0 THEN '0'
+        ELSE ROUND((total_sales / lifespan))
+    END AS avg_monthly_sales
+FROM aggregted_sales;
+
+SELECT * FROM datawarehouseanalytics.customer_report;
+
+SELECT AVG(recency)
+FROM datawarehouseanalytics.customer_report
+WHERE customer_category = 'Regular';
+/*
+=================================================== Product Report ============================================
+    1. Gathers essential fields such as product name, category, subcategory, and cost.
+    2. Segments products by revenue to identify High-Performers, Mid-Range, or Low-Performers.
+    3. Aggregates product-level metrics:
+       - total orders
+       - total sales
+       - total quantity sold
+       - total customers (unique)
+       - lifespan (in months)
+    4. Calculates valuable KPIs:
+       - recency (months since last sale)
+       - average order revenue (AOR)
+       - average monthly revenue
+*/
+
+CREATE OR REPLACE VIEW datawarehouseanalytics.product_report AS
+WITH product_details AS(
+SELECT p.product_key,
+	p.product_name,
+    p.category,
+    p.subcategory,
+    p.cost,
+    f.order_number,
+    f.customer_key,
+    f.order_date,
+    f.sales_amount,
+    f.quantity
+FROM datawarehouseanalytics.dim_products p
+LEFT JOIN datawarehouseanalytics.fact_Sales f
+	ON f.product_key = p.product_key
+WHERE order_date IS NOT NULL),
+    
+aggregated_product_sales AS (
+SELECT product_key,
+	product_name,
+    category,
+    subcategory,
+    cost,
+    COUNT(DISTINCT order_number) AS total_orders,
+    COALESCE(SUM(sales_amount),0) AS total_sales,
+    COALESCE(SUM(quantity),0) AS total_quantity,
+    COUNT(DISTINCT customer_key) as total_customers,
+    COALESCE(TIMESTAMPDIFF(month, MIN(order_date), MAX(order_date)),0) AS lifespan,
+    MAX(order_date) AS last_order_date
+FROM product_details
+GROUP BY product_key, product_name, category, subcategory,cost)
+
+SELECT product_key,
+	product_name,
+    category,
+    subcategory,
+    cost,
+    total_orders,
+    total_sales,
+    CASE
+		WHEN total_orders BETWEEN 0 AND 10 THEN 'Low-Performers'
+        WHEN total_orders BETWEEN 10 AND 100 THEN 'Mid-Range'
+        ELSE 'High-Performers'
+    END AS product_segment,
+    total_quantity,
+    total_customers,
+    lifespan,
+    COALESCE(TIMESTAMPDIFF(month, last_order_date, '2014-03-01'),0) AS recency,
+    CASE 
+		WHEN total_sales = 0 THEN 0
+        ELSE ROUND(total_sales/total_orders)
+    END AS average_value_order,
+    CASE 
+		WHEN total_sales = 0 THEN 0
+        ELSE ROUND(total_sales/lifespan)
+	END AS average_monthly_sales
+FROM aggregated_product_sales;
+
+SELECT * FROM datawarehouseanalytics.product_report;
+
