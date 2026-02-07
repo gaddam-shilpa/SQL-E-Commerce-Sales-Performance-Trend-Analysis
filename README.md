@@ -1,46 +1,51 @@
-# 📊 E-Commerce Sales Performance \& Trend Analys
+# 📊 E-Commerce Sales Performance & Trend Analysis
 
 ## 📌 Project Overview
-This project analyzes sales, customers, and product data using Basic to Advanced SQL.<br>
-The data was cleaned and loaded into a relational database and then analyzed to understand business performance, trends over time, and product/customer behavior.
-
-## 🧪 SQL Concepts Used
-Joins, Aggregate functions, CTEs, Window functions, Ranking functions, Running totals, Moving averages, CASE statements, Views
-
-## 📁Key Analysis \& Insights
-* Designed and executed end-to-end SQL analysis on e-commerce sales data (~29M revenue, 23K+ customers, 270+ products) to evaluate business performance and trends.
-* Built core business KPIs using advanced SQL aggregations (SUM, COUNT, AVG) to quantify total sales, orders, customers, and pricing behavior.
-* Applied CTEs and window functions to perform cumulative analysis, identifying that over 50% of total revenue was generated in the final year, indicating accelerating growth.
-* Used running totals and 3-month moving averages to detect volume-driven growth, where average prices declined sharply while sales increased.
-* Performed product performance analysis using year-over-year comparisons and ranking functions, identifying 33% improving products and 15% declining products across the catalog.
-* Created reusable customer-level and product-level SQL views to centralize KPIs such as revenue, recency, lifespan, and average order value for downstream analysis and reporting.
-
-## 🧠 Analytical Summary
-<p align="justify">
-This project follows a step-by-step analytical flow to understand how the business performs and evolves.<br>
-The analysis begins with exploring customer and product dimensions 🌍📦 to understand geographic coverage and product structure. This step helps validate the data and ensures it is suitable for deeper analysis.<br>
-Next, core business metrics 📈 such as total sales, orders, customers, and average prices are calculated to create a baseline view of overall performance. This provides a quick snapshot of the size and health of the business.<br>
-To understand where the business is strong, distribution analysis is performed across countries and product categories. This helps identify major markets, revenue-contributing categories, and high-value customers.<br>
-The analysis then compares product count with revenue by category ⚖️. This highlights categories with many products but low revenue contribution, as well as categories with fewer products that generate higher revenue per product, helping evaluate category efficiency.<br>
-Using ranking analysis 🏆, top-performing and low-performing products and customers are identified. This allows focus on key revenue drivers as well as underperforming areas.<br>
-Time-based analysis ⏳ examines sales trends across years and months, revealing clear growth patterns. A cumulative analysis using running totals shows that sales growth accelerates over time, with a significant share of total revenue generated in later periods. At the same time, a declining 3-month moving average price indicates that growth is driven by higher sales volume rather than price increases.<br>
-Product performance is further evaluated year over year to identify improving, stable, and declining products. Product lifecycle and recency analysis 🔄 helps classify products as active, aging, or inactive based on how long they have been selling and how recently they were sold.<br>
-Finally, reusable SQL views 🧩 are created to summarize customer-level and product-level metrics, making future analysis and reporting easier without rewriting complex queries.<br>
-Overall, this project demonstrates the use of SQL for end-to-end data analysis, from data exploration and KPI creation to trend analysis, cumulative growth tracking, and performance evaluation.<br>
-</p>
+This project delivers a comprehensive analysis of sales, customers, and product data using **Basic to Advanced SQL**. The workflow involved cleaning raw data, loading it into a relational database, and executing deep-dive queries to uncover business performance, temporal trends, and behavioral patterns.
 
 ## 🛠️ Tech Stack
-- SQL (MySQL)
-- Relational Database
-- CSV Data
-- ETL for data cleaning and loading
+* **SQL (MySQL):** Primary engine for data transformation and analysis.
+* **Relational DB:** Data storage and schema management.
+* **ETL Process:** Data cleaning and structured loading from CSV sources.
+
+## 🧪 SQL Concepts Used
+* **Advanced Aggregations:** SUM, COUNT, AVG
+* **Complex Logic:** CTEs, CASE Statements, Views
+* **Analytical Functions:** Window Functions (Ranking, Running Totals, Moving Averages)
+* **Data Structure:** Joins, Relational Database Design
+
+---
+
+## 📁 Key Analysis & Insights
+* **Scale of Analysis:** Executed end-to-end SQL queries on a dataset representing **~$29M in revenue**, **23K+ customers**, and **270+ products**.
+* **Accelerated Growth:** Identified through **CTEs and Window Functions** that over **50% of total revenue** was generated in the final year.
+* **Volume-Driven Strategy:** Used **3-month moving averages** to detect a trend where sales volume increased significantly despite a sharp decline in average unit prices.
+* **Product Catalog Health:** Classified products using **Ranking Functions**, identifying that **33%** of products are improving while **15%** are in decline.
+* **Data Reusability:** Developed modular **SQL Views** to centralize KPIs (Recency, Lifespan, AOV), streamlining downstream reporting.
+
+---
+
+## 🧠 Analytical Summary
+This project follows a structured analytical flow to decode business evolution:
+
+1. **Exploration & Validation:** Audited geographic coverage and product structures to ensure data integrity.
+2. **Baseline Metrics:** Established core KPIs (Total Sales, Orders, Customers) to create a snapshot of business health.
+3. **Distribution & Efficiency:** Analyzed revenue by category vs. product count to identify "high-efficiency" categories (low product count, high revenue).
+4. **Ranking:** Isolated top-performing customers and products to identify primary revenue drivers.
+5. **Temporal Trends:**
+    * **Cumulative Analysis:** Proved accelerating growth using running totals.
+    * **Price vs. Volume:** Determined that growth was volume-led rather than price-led.
+6. **Lifecycle Analysis:** Classified products as **Active, Aging, or Inactive** based on recency and sales duration.
+7. **Optimization:** Encapsulated complex logic into reusable views for efficient future querying.
+
+---
 
 ## ✅ Project Outcome
-This project showcases:
-- Structured SQL-based data analysis 🔍
-- Business-focused KPI creation 📊
-- Trend and cumulative growth analysis 📈
-- Product and customer performance evaluation 🧠
-- Creation of reusable analytical SQL views ♻️
+This project demonstrates proficiency in:
+* **Structured SQL-based data analysis** 🔍
+* **Business-focused KPI creation** 📊
+* **Trend & Cumulative growth tracking** 📈
+* **Product & Customer performance evaluation** 🧠
+* **Modular code design via SQL Views** ♻️
 
-This README focuses on analysis and insights. Detailed SQL queries and logic are available in the project folder
+> Detailed SQL queries and logic scripts are available in the project folder.
